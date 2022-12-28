@@ -9,3 +9,4 @@ vscode:
   extensions:
     - ms-pyright.pyright
     - mtsmfm.vscode-stl-viewer
+    - ms-python.python

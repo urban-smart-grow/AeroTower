@@ -9,7 +9,3 @@ vscode:
   extensions:
     - ms-pyright.pyright
     - mtsmfm.vscode-stl-viewer
-
-tasks:
-  - name: 'install python packages'
-    command: pip install -r requirements.txt && exit

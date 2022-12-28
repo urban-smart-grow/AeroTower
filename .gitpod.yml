@@ -10,3 +10,8 @@ vscode:
     - ms-pyright.pyright
     - mtsmfm.vscode-stl-viewer
     - ms-python.python
+    - ms-python.isort
+    - ms-toolsai.jupyter
+    - ms-toolsai.jupyter-keymap
+    - ms-toolsai.vscode-jupyter-cell-tags
+    - ms-toolsai.vscode-jupyter-slideshow

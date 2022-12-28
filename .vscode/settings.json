@@ -1,0 +1,6 @@
+{
+  "editor.defaultFormatter": "ms-pyright.pyright",
+  "stlViewer.showAxes": true,
+  "stlViewer.viewOffset": 100,
+  "stlViewer.meshMaterialType": "normal"
+}

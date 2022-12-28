@@ -1,0 +1,2 @@
+ply==3.11
+solidpython2==2.0.0b1

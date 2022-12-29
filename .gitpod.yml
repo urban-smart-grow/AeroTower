@@ -1,6 +1,11 @@
 image:
   file: .gitpod.Dockerfile
 
+tasks:
+  - command: |
+      python3 -m pip install --upgrade pip
+      python3 -m pip install --pre cadquery
+
 github:
   prebuilds:
     master: true

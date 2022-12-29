@@ -1,4 +1,6 @@
 *.scad
 *.stl
 
-!export/*.stl
+!exports/*.stl
+
+**/__pycache__/**

@@ -4,4 +4,6 @@ RUN sudo install-packages openscad
 
 USER gitpod
 
-RUN pip3 install solidpython2
+RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install --pre cadquery
+RUN npm i -g nodemon

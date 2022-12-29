@@ -1,5 +1,5 @@
-from solid2 import cube
+import cadquery as cq
 
-c = cube(20, )
+cube = cq.Workplane('XY').box(10, 10, 10)
 
-c.save_as_stl('test.stl')
+cq.exporters.export(cube, 'test.stl')

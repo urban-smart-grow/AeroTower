@@ -1,11 +1,11 @@
 import cadquery as cq
 import math
-from primitives.cone import cone
+from primitives.hollow_cone import hollow_cone
 
 height = 80
 bottom_diameter = 52
 top_diameter = 60
-wall_strength = 2
+wall_strength = 1
 hole_d = 6
 
 offsets = range(0, bottom_diameter//2, 10)
@@ -15,18 +15,14 @@ points = [(math.cos(rad)*offset, math.sin(rad)*offset)
 
 
 plant_cup = (
-    cone(
+    hollow_cone(
         top_diameter,
         bottom_diameter,
-        height
+        height,
+        wall_strength
     )
     .pushPoints(points)
     .hole(hole_d)
-    - cone(
-        top_diameter-wall_strength,
-        bottom_diameter-wall_strength,
-        height-wall_strength,
-    ).translate((0, 0, wall_strength))
 )
 
 if __name__ == '__main__':

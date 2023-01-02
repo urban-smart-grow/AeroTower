@@ -14,15 +14,20 @@ points = [(math.cos(rad)*offset, math.sin(rad)*offset)
           for rad in radians for offset in offsets]
 
 
+cq.Workplane.hollow_cone = hollow_cone
+
 plant_cup = (
-    hollow_cone(
+    cq.Workplane('XY')
+    .hollow_cone(
         top_diameter,
         bottom_diameter,
         height,
         wall_strength
     )
+    .workplane()
     .pushPoints(points)
     .hole(hole_d)
+    .combine()
 )
 
 if __name__ == '__main__':

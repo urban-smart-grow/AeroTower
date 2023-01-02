@@ -16,8 +16,14 @@ thread = IsoThread(
     end_finishes=('fade', 'fade')
 ).cq_object.translate(Vector(0, 0, height-socket_height))
 
+cq.Workplane.hollow_cone = hollow_cone
+
 tank = thread.fuse(
-    hollow_cone(diameter, diameter, height, wall).val()
+    cq.Solid.makeCylinder(diameter/2, height)
+    .cut(
+        cq.Solid.makeCylinder(diameter/2-wall, height-wall)
+        .translate(Vector(0, 0, wall))
+    )
 )
 
 exporters.export(tank, './exports/tank.stl')

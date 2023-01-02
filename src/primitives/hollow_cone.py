@@ -1,16 +1,19 @@
-from .cone import cone
+from cadquery import Vector, cq
 
 
-def hollow_cone(top_diameter, bottom_diameter, height, wall):
-    return (
-        cone(
-            top_diameter,
-            bottom_diameter,
-            height
-        )
-        - cone(
-            top_diameter-(wall*2),
-            bottom_diameter-(wall*2),
+def hollow_cone(self, top_diameter, bottom_diameter, height, wall):
+    _hollow_cone = cq.Solid.makeCone(
+        bottom_diameter/2,
+        top_diameter/2,
+        height
+    ).cut(
+        cq.Solid.makeCone(
+            bottom_diameter/2-wall,
+            top_diameter/2-wall,
             height-wall,
-        ).translate((0, 0, wall))
+        ).translate(Vector(0, 0, wall))
+    )
+
+    return self.eachpoint(
+        lambda loc: _hollow_cone.locate(loc)
     )

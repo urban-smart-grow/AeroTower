@@ -1,6 +1,10 @@
 image:
   file: .gitpod.Dockerfile
 
+tasks:
+  - name: install formatter
+    command: python3 -m pip install autopep8 && exit
+
 github:
   prebuilds:
     master: true

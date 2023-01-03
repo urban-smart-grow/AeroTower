@@ -1,3 +1,4 @@
+import math
 from cadquery import Location, Vector, cq, exporters
 from utils.calculate_points_on_circle import calculate_circle_points
 import plant_cup
@@ -5,8 +6,23 @@ import time
 
 wall = 1
 diameter = 160
-height = 150
-number_of_cup_holders = 5
+height = 164
+number_of_cup_holders = 3
+
+
+a = plant_cup.bottom_diameter
+drop_cut = (
+    cq.Solid.makeBox(a, a/2, a, Vector(-a/2, 0, 0))
+    .cut(
+        cq.Solid.makeCylinder(a/2, a, Vector(a/2, a/2, 0))
+    )
+    .cut(
+        cq.Solid.makeCylinder(a/2, a, Vector(-a/2, a/2, 0))
+    )
+    .rotate(Vector(), Vector(1, 0, 0), 90)
+    .rotate(Vector(), Vector(0, 0, 1), -90)
+
+)
 
 
 def locate_cone(loc: Location):
@@ -18,13 +34,14 @@ def locate_cone(loc: Location):
             plant_cup.top_diameter/2,
             plant_cup.height
         )
-        .rotate(Vector(0, 0, 0), Vector(-y, x, 0), 45)
+        .rotate(Vector(), Vector(-y, x, 0), 45)
         .locate(loc)
     )
 
 
 def locate_socket(loc: Location):
     x, y, z = loc.toTuple()[0]
+    angle = math.degrees(math.atan2(y, x))
 
     return (
         cq.Solid
@@ -41,12 +58,15 @@ def locate_socket(loc: Location):
                 plant_cup.height
             )
         )
-        .rotate(Vector(0, 0, 0), Vector(-y, x, 0), 45)
+        .cut(drop_cut)
+        .rotate(Vector(), Vector(0, 0, 1), angle)
+        .rotate(Vector(), Vector(-y, x, 0), 45)
         .locate(loc)
     )
 
 
 start = time.time()
+
 
 body = (
     cq.Workplane('XY')
@@ -63,6 +83,7 @@ body = (
         cq.Solid.makeCylinder(diameter/2, height)
     )
 )
+
 
 end = time.time()
 

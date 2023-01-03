@@ -1,10 +1,12 @@
-from cadquery import Location, Vector, Workplane, cq, exporters
+from cadquery import Location, Vector, cq, exporters
 from utils.calculate_points_on_circle import calculate_circle_points
 import plant_cup
+import time
 
 wall = 1
 diameter = 160
-height = 180
+height = 150
+number_of_cup_holders = 5
 
 
 def locate_cone(loc: Location):
@@ -44,15 +46,17 @@ def locate_socket(loc: Location):
     )
 
 
+start = time.time()
+
 body = (
     cq.Workplane('XY')
     .circle(diameter/2)
     .circle(diameter/2-wall)
     .extrude(height)
     .workplane(offset=-20)
-    .pushPoints(calculate_circle_points(5, height/3))
+    .pushPoints(calculate_circle_points(number_of_cup_holders, diameter/3))
     .cutEach(locate_cone)
-    .pushPoints(calculate_circle_points(5, height/3))
+    .pushPoints(calculate_circle_points(number_of_cup_holders, diameter/3))
     .eachpoint(locate_socket, combine='a')
     .combine()
     .intersect(
@@ -60,5 +64,9 @@ body = (
     )
 )
 
+end = time.time()
 
-exporters.export(body, './exports/body.stl')
+print(f'took {end-start:0.2f} seconds')
+
+if __name__ == '__main__':
+    exporters.export(body, './exports/body.stl')

@@ -10,7 +10,7 @@ import time
 wall = 1
 diameter = 160
 height = 164
-number_of_cup_holders = 1
+number_of_cup_holders = 5
 cup_angle = 45
 socket_height = 20
 pitch = 8
@@ -74,7 +74,7 @@ start = time.time()
 
 top_thread = IsoThread(
     major_diameter=diameter-wall,
-    pitch=pitch,
+    pitch=pitch-0.2,
     length=socket_height,
     external=False,
     end_finishes=('fade', 'fade')

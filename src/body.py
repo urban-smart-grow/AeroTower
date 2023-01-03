@@ -9,6 +9,19 @@ wall = 1
 diameter = 160
 height = 164
 number_of_cup_holders = 3
+cup_angle = 45
+
+socket_offset = (diameter)/2 - (
+    math.cos(math.radians(cup_angle))
+    * (plant_cup.bottom_diameter/2+wall)
+)
+
+points = list(
+    calculate_circle_points(
+        number_of_cup_holders,
+        socket_offset
+    )
+)
 
 
 def locate_cone(loc: Location):
@@ -20,7 +33,7 @@ def locate_cone(loc: Location):
             plant_cup.top_diameter/2,
             plant_cup.height
         )
-        .rotate(Vector(), Vector(-y, x, 0), 45)
+        .rotate(Vector(), Vector(-y, x, 0), cup_angle)
         .locate(loc)
     )
 
@@ -46,7 +59,7 @@ def locate_socket(loc: Location):
         )
         .cut(drop_cut(plant_cup.bottom_diameter))
         .rotate(Vector(), Vector(0, 0, 1), angle)
-        .rotate(Vector(), Vector(-y, x, 0), 45)
+        .rotate(Vector(), Vector(-y, x, 0), cup_angle)
         .locate(loc)
     )
 
@@ -60,9 +73,9 @@ body = (
     .circle(diameter/2-wall)
     .extrude(height)
     .workplane(offset=-20)
-    .pushPoints(calculate_circle_points(number_of_cup_holders, diameter/3))
+    .pushPoints(points)
     .cutEach(locate_cone)
-    .pushPoints(calculate_circle_points(number_of_cup_holders, diameter/3))
+    .pushPoints(points)
     .eachpoint(locate_socket, combine='a')
     .combine()
     .intersect(
@@ -70,8 +83,8 @@ body = (
     )
 )
 
-
 end = time.time()
+
 
 print(f'took {end-start:0.2f} seconds')
 

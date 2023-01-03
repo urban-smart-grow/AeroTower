@@ -1,5 +1,6 @@
 import math
 from cadquery import Location, Vector, cq, exporters
+from primitives.drop_cut import drop_cut
 from utils.calculate_points_on_circle import calculate_circle_points
 import plant_cup
 import time
@@ -8,21 +9,6 @@ wall = 1
 diameter = 160
 height = 164
 number_of_cup_holders = 3
-
-
-a = plant_cup.bottom_diameter
-drop_cut = (
-    cq.Solid.makeBox(a, a/2, a, Vector(-a/2, 0, 0))
-    .cut(
-        cq.Solid.makeCylinder(a/2, a, Vector(a/2, a/2, 0))
-    )
-    .cut(
-        cq.Solid.makeCylinder(a/2, a, Vector(-a/2, a/2, 0))
-    )
-    .rotate(Vector(), Vector(1, 0, 0), 90)
-    .rotate(Vector(), Vector(0, 0, 1), -90)
-
-)
 
 
 def locate_cone(loc: Location):
@@ -58,7 +44,7 @@ def locate_socket(loc: Location):
                 plant_cup.height
             )
         )
-        .cut(drop_cut)
+        .cut(drop_cut(plant_cup.bottom_diameter))
         .rotate(Vector(), Vector(0, 0, 1), angle)
         .rotate(Vector(), Vector(-y, x, 0), 45)
         .locate(loc)

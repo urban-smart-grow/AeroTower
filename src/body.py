@@ -80,8 +80,10 @@ top_thread = IsoThread(
     end_finishes=('fade', 'fade')
 ).cq_object.translate(Vector(0, 0, height-socket_height))
 
+bottom_thread_major_diameter = diameter-(wall*2)
+
 bottom_thread = IsoThread(
-    major_diameter=diameter-(wall*2),
+    major_diameter=bottom_thread_major_diameter,
     pitch=pitch,
     length=socket_height,
     external=True,

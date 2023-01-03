@@ -11,5 +11,7 @@ RUN pyenv rehash
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --pre cadquery
 RUN python3 -m pip install git+https://github.com/gumyr/cq_warehouse.git#egg=cq_warehouse
+RUN python3 -m pip install autopep8
+
 
 RUN npm install --global nodemon

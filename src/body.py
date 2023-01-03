@@ -1,15 +1,19 @@
 import math
 from cadquery import Location, Vector, cq, exporters
 from primitives.drop_cut import drop_cut
+from primitives.hollow_cone import hollow_cone
 from utils.calculate_points_on_circle import calculate_circle_points
+from cq_warehouse.thread import IsoThread
 import plant_cup
 import time
 
 wall = 1
 diameter = 160
 height = 164
-number_of_cup_holders = 3
+number_of_cup_holders = 1
 cup_angle = 45
+socket_height = 20
+pitch = 8
 
 socket_offset = (diameter)/2 - (
     math.cos(math.radians(cup_angle))
@@ -22,6 +26,8 @@ points = list(
         socket_offset
     )
 )
+
+cq.Workplane.hollow_cone = hollow_cone
 
 
 def locate_cone(loc: Location):
@@ -66,22 +72,69 @@ def locate_socket(loc: Location):
 
 start = time.time()
 
+top_thread = IsoThread(
+    major_diameter=diameter-wall,
+    pitch=pitch,
+    length=socket_height,
+    external=False,
+    end_finishes=('fade', 'fade')
+).cq_object.translate(Vector(0, 0, height-socket_height))
+
+bottom_thread = IsoThread(
+    major_diameter=diameter-(wall*2),
+    pitch=pitch,
+    length=socket_height,
+    external=True,
+    end_finishes=('fade', 'fade')
+)
+
+thread_body_radius_delta = (
+    diameter / 2
+    - bottom_thread.min_radius
+)
+
+thread_body_transition_height = thread_body_radius_delta*2
+
+bottom_thread_min_radius = bottom_thread.min_radius
+
+bottom_thread = bottom_thread.fuse(
+    cq.Workplane('XY')
+    .circle(bottom_thread.min_radius)
+    .circle(bottom_thread.min_radius - wall)
+    .extrude(socket_height)
+    .val()
+)
 
 body = (
-    cq.Workplane('XY')
+    cq.Workplane('XY', origin=Vector(
+        0, 0, (socket_height+(thread_body_transition_height))
+    ))
     .circle(diameter/2)
     .circle(diameter/2-wall)
-    .extrude(height)
+    .extrude(height-(socket_height+thread_body_radius_delta))
     .workplane(offset=-20)
     .pushPoints(points)
     .cutEach(locate_cone)
     .pushPoints(points)
     .eachpoint(locate_socket, combine='a')
+    .add(top_thread)
+    .add(bottom_thread)
+    .add(
+        cq.Workplane('XY', origin=Vector(0, 0, socket_height))
+        .hollow_cone(
+            diameter,
+            bottom_thread_min_radius*2,
+            thread_body_transition_height,
+            wall,
+            bottom=0
+        )
+    )
     .combine()
     .intersect(
         cq.Solid.makeCylinder(diameter/2, height)
     )
 )
+
 
 end = time.time()
 

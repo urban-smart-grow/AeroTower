@@ -1,13 +1,15 @@
 from cadquery import Vector, cq, exporters
 
-l = 100
-w = 60
-h = 24
 wall = 2
+
 piezo_h = 3
 piezo_d = 20
 piezo_case_h = piezo_h + wall*2
 piezo_case_d = piezo_d + wall*2
+
+h = piezo_d + wall * 2
+l = 100
+w = 100
 
 head = (
     cq.Workplane('XY')
@@ -16,7 +18,8 @@ head = (
     .box(l, w, h, combine='s')
     .edges('|Z')
     .fillet(4)
-    .faces('>Y')
+    .tag('case')
+    .faces('<Y', 'case')
     .edges('<Z')
     .workplane(
         centerOption='CenterOfMass',
@@ -28,12 +31,31 @@ head = (
         piezo_case_h,
         centered=(True, False, False),
     )
+    .tag('pump_socket')
+    .faces('>Y', 'case')
+    .edges('<Z')
+    .workplane(
+        centerOption='CenterOfMass',
+        offset=-piezo_case_h
+    )
+    .box(
+        piezo_case_d,
+        h,
+        piezo_case_h,
+        centered=(True, False, False),
+    )
+    .tag('piezo_socket')
+    .faces('>Z', 'case')
+    .edges('<Y')
+    .workplane(centerOption='CenterOfMass')
+    .move(0, piezo_case_h/2)
+    .hole(4)
     .edges('|Z')
     .fillet(2)
-    .faces('>Y')
+    .faces('>Y',  'piezo_socket')
     .workplane(centerOption='CenterOfMass')
     .hole(6, piezo_case_h)
-    .faces('>Y')
+    .faces('>Y', 'piezo_socket')
     .workplane(
         offset=wall,
         centerOption='CenterOfMass',

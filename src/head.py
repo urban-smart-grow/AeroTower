@@ -4,7 +4,7 @@ wall = 2
 
 piezo_h = 3
 piezo_d = 20
-piezo_case_h = piezo_h + wall*2
+piezo_case_h = piezo_h + 6 + wall*2
 piezo_case_d = piezo_d + wall*2
 
 h = piezo_d + wall * 2
@@ -55,9 +55,6 @@ head = (
     .hole(tube_d)
     .edges('|Z')
     .fillet(4)
-    .faces('>Y',  'piezo_socket')
-    .workplane(centerOption='CenterOfMass')
-    .hole(6, piezo_case_h)
     .faces('>Y', 'piezo_socket')
     .workplane(
         offset=wall,
@@ -67,6 +64,13 @@ head = (
     .move(0, -piezo_case_d/2)
     .slot2D(piezo_case_d*2, piezo_d, 90)
     .extrude(piezo_h, combine='s')
+    .faces('>Y',  'piezo_socket')
+    .workplane(centerOption='CenterOfMass')
+    .transformed(offset=cq.Vector(0, 0, 0), rotate=cq.Vector(-10, 0, 0))
+    .hole(6, piezo_case_h + wall)
+    .faces('>Y',  'piezo_socket')
+    .workplane(centerOption='CenterOfMass')
+    .hole(piezo_d-wall*2, wall)
 )
 
 

@@ -11,10 +11,12 @@ h = piezo_d + wall * 2
 l = piezo_case_d
 w = 60
 
-pump_in_out_gap = 4
+pump_in_out_gap = 3
 pump_case_width = piezo_case_d
 pump_case_depth = 10
-tube_d = 3
+tube_d = 4
+pump_socket_d = pump_in_out_gap+tube_d+1
+pump_socket_w = 8.5
 
 head = (
     cq.Workplane('XY')
@@ -51,10 +53,18 @@ head = (
     .faces('>Z', 'case')
     .edges('<Y')
     .workplane(centerOption='CenterOfMass')
-    .move(0, pump_case_depth - pump_in_out_gap)
+    .tag('temp')
+    .move(0, pump_case_depth - tube_d/2 - pump_in_out_gap)
     .hole(tube_d)
     .edges('|Z')
     .fillet(4)
+    .workplaneFromTagged('temp')
+    .moveTo(0, pump_case_depth - (pump_socket_d))
+    .box(
+        pump_socket_w, pump_socket_d, 10,
+        combine='s',
+        centered=(True, False, True)
+    )
     .faces('>Y', 'piezo_socket')
     .workplane(
         offset=wall,

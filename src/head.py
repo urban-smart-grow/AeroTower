@@ -6,15 +6,16 @@ piezo_h = 3
 piezo_d = 20
 piezo_case_h = piezo_h + 6 + wall*2
 piezo_case_d = piezo_d + wall*2
+filter_d = 8
 
-h = piezo_d + wall * 2
+h = piezo_case_d
 l = piezo_case_d
 w = 60
 
-pump_in_out_gap = 3
+pump_in_out_gap = 3.5
 pump_case_width = piezo_case_d
 pump_case_depth = 10
-tube_d = 4
+tube_d = 4.5
 pump_socket_d = pump_in_out_gap+tube_d+1
 pump_socket_w = 8.5
 
@@ -71,16 +72,24 @@ head = (
         centerOption='CenterOfMass',
         invert=True
     )
+    .move(0, -wall)
     .move(0, -piezo_case_d/2)
     .slot2D(piezo_case_d*2, piezo_d, 90)
     .extrude(piezo_h, combine='s')
+    .tag('piezo_slot')
     .faces('>Y',  'piezo_socket')
     .workplane(centerOption='CenterOfMass')
     .transformed(offset=cq.Vector(0, 0, 0), rotate=cq.Vector(-10, 0, 0))
-    .hole(6, piezo_case_h + wall)
+    .move(0, wall)
+    .hole(filter_d, piezo_case_h + wall)
     .faces('>Y',  'piezo_socket')
-    .workplane(centerOption='CenterOfMass')
-    .hole(piezo_d-wall*2, wall)
+    .tag('filter_hole')
+    .workplane(centerOption='CenterOfMass', offset=-wall)
+    .move(0, wall)
+    .move(0, wall+h)
+    .slot2D(h*3, (piezo_d-wall*2), 90)
+    .extrude(wall, combine='s')
+    .tag('piezo_slot_case')
 )
 
 

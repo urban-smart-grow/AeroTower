@@ -1,8 +1,11 @@
 from cadquery import cq, exporters
 
 mount_points = [
-    (55, 10), (75, 10), (75, 45), (55, 45),
+    # Xiao with extension board
+    (55, 5), (75, 5), (75, 40), (55, 40),
+    # Atomizer
     (35, 20), (35, 40), (5, 30),
+    # Pump/Mosfet
     (35, 45), (35, 65), (5, 55),
 ]
 

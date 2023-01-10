@@ -1,10 +1,10 @@
 {
   "editor.defaultFormatter": "ms-pyright.pyright",
   "stlViewer.showAxes": true,
-  "stlViewer.viewOffset": 40,
+  "stlViewer.viewOffset": 60,
   "stlViewer.meshMaterialType": "normal",
   "python.analysis.extraPaths": [
     "/workspace/.vscode-remote/extensions/roipoussiere.cadquery-0.1.3-universal/stubs"
   ],
-  "stlViewer.showInfo": true
+  "stlViewer.showInfo": false
 }

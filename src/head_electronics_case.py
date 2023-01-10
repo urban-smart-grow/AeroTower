@@ -1,8 +1,12 @@
 from cadquery import cq, exporters
 
+length = 100
+width = 70
+
+
 mount_points = [
     # Xiao with extension board
-    (55, 5), (75, 5), (75, 40), (55, 40),
+    (75, 5), (95, 5), (95, 40), (75, 40),
     # Atomizer
     (35, 20), (35, 40), (5, 30),
     # Pump/Mosfet
@@ -11,7 +15,7 @@ mount_points = [
 
 head_electronics_case = (
     cq.Workplane('XY')
-    .box(80, 70, 4, centered=False)
+    .box(length, width, 4, centered=False)
     .tag('base')
     .faces('>Z')
     .workplane()
@@ -28,11 +32,35 @@ head_electronics_case = (
     .workplaneFromTagged('battery_mount')
     .center(0, 5)
     .box(40, 6, 14, centered=False, combine='s')
-    .faces('<Z', 'base')
-    .workplane(centerOption='CenterOfMass')
-    .box(84, 74, 2, centered=(True, True, False))
+    .faces('>Z', 'base')
+    .workplane(centerOption='CenterOfMass', offset=-2)
+    .box(
+        10, width, 2,
+        centered=(True, True, False),
+        combine='s'
+    )
+    .tab('wire_channel')
+    .faces('>Z', 'base')
+    .edges('<Y')
+    .workplane(centerOption='CenterOfMass', offset=-4)
+    .box(
+        10, 6, 4,
+        centered=(True, False, False),
+        combine='s'
+    )
+    .tag('wire_outlet')
     .edges('|Z')
     .fillet(2)
+    .faces('>Z', 'base')
+    .edges('>Y')
+    .workplane(centerOption='CenterOfMass', offset=-4)
+    .move(0, -20.6)
+    .box(
+        8.6, 18.6, 4,
+        centered=(True, False, False),
+        combine='s'
+    )
+    .tag('pump_hole')
 )
 
 if __name__ == '__main__':

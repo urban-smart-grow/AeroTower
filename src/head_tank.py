@@ -1,5 +1,7 @@
+from operator import invert
 from cadquery import Vector, cq, exporters
 
+outline_width = 70
 wall = 2
 
 piezo_h = 3
@@ -10,14 +12,33 @@ filter_d = 8
 
 h = piezo_case_d
 l = piezo_case_d
-w = 60
+w = outline_width - wall * 2
 
-pump_in_out_gap = 3.5
+pump_in_out_gap = 4
 pump_case_width = piezo_case_d
-pump_case_depth = 10
 tube_d = 4.5
-pump_socket_d = pump_in_out_gap+tube_d+1
+pump_inlet_outline_padding = 1.2
+pump_socket_d = pump_in_out_gap+tube_d+pump_inlet_outline_padding
 pump_socket_w = 8.5
+pump_case_depth = pump_socket_d + wall
+
+
+mount_points = [
+    (-10, 26), (10, 26), (10, -31), (-10, -31)
+]
+
+
+def add_mount_points(self: cq.Workplane):
+    return (
+        self
+        .faces('<Z')
+        .workplane(centerOption='CenterOfMass')
+        .transformed(rotate=(0, 180, 0))
+        .pushPoints(mount_points)
+    )
+
+
+cq.Workplane.add_mount_points = add_mount_points
 
 head = (
     cq.Workplane('XY')
@@ -55,12 +76,12 @@ head = (
     .edges('<Y')
     .workplane(centerOption='CenterOfMass')
     .tag('temp')
-    .move(0, pump_case_depth - tube_d/2 - pump_in_out_gap)
+    .move(0, tube_d/2 + wall + pump_inlet_outline_padding)
     .hole(tube_d)
     .edges('|Z')
-    .fillet(4)
+    .fillet(2)
     .workplaneFromTagged('temp')
-    .moveTo(0, pump_case_depth - (pump_socket_d))
+    .moveTo(0, wall)
     .box(
         pump_socket_w, pump_socket_d, 10,
         combine='s',
@@ -90,8 +111,11 @@ head = (
     .slot2D(h*3, (piezo_d-wall*2), 90)
     .extrude(wall, combine='s')
     .tag('piezo_slot_case')
+    .rotate(Vector(), Vector(0, 0, 1), 180)
+    .add_mount_points()
+    .circle(2).extrude(h + 2)
 )
 
 
 if __name__ == '__main__':
-    exporters.export(head, './exports/head.stl')
+    exporters.export(head, './exports/head_tank.stl')

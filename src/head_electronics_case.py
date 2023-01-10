@@ -1,12 +1,15 @@
 from cadquery import cq, exporters
+from head_tank import add_mount_points
 
 length = 100
 width = 70
 
 
+cq.Workplane.add_mount_points = add_mount_points
+
 mount_points = [
     # Xiao with extension board
-    (75, 5), (95, 5), (95, 40), (75, 40),
+    (67.5, 5), (87.5, 5), (87.5, 40), (67.5, 40),
     # Atomizer
     (35, 20), (35, 40), (5, 30),
     # Pump/Mosfet
@@ -39,7 +42,7 @@ head_electronics_case = (
         centered=(True, True, False),
         combine='s'
     )
-    .tab('wire_channel')
+    .tag('wire_channel')
     .faces('>Z', 'base')
     .edges('<Y')
     .workplane(centerOption='CenterOfMass', offset=-4)
@@ -61,6 +64,9 @@ head_electronics_case = (
         combine='s'
     )
     .tag('pump_hole')
+    .translate((-length/2, -width/2, 0))
+    .add_mount_points()
+    .circle(2).extrude(2, combine='s')
 )
 
 if __name__ == '__main__':

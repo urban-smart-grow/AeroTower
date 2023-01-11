@@ -3,6 +3,7 @@ from head_tank import add_mount_points
 
 length = 100
 width = 70
+base_height = 4
 
 
 cq.Workplane.add_mount_points = add_mount_points
@@ -16,9 +17,12 @@ mount_points = [
     (35, 45), (35, 65), (5, 55),
 ]
 
+battery_mount_outline = (40, 16, 14)
+battery_mount_cut = (40, 6, 14)
+
 head_electronics_case = (
     cq.Workplane('XY')
-    .box(length, width, 4, centered=False)
+    .box(length, width, base_height, centered=False)
     .tag('base')
     .faces('>Z')
     .workplane()
@@ -31,10 +35,10 @@ head_electronics_case = (
     .faces('>Z', 'base')
     .vertices('<XY')
     .workplane(centerOption='CenterOfMass').tag('battery_mount')
-    .box(40, 16, 14, centered=False)
+    .box(*battery_mount_outline, centered=False)
     .workplaneFromTagged('battery_mount')
     .center(0, 5)
-    .box(40, 6, 14, centered=False, combine='s')
+    .box(*battery_mount_cut, centered=False, combine='s')
     .faces('>Z', 'base')
     .workplane(centerOption='CenterOfMass', offset=-2)
     .box(

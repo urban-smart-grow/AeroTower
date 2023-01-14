@@ -71,7 +71,7 @@ def locate_socket(loc: Location):
 
 
 start = time.time()
-top_thread_major_diameter = diameter-wall
+top_thread_major_diameter = diameter-(wall*2)
 top_thread = IsoThread(
     major_diameter=top_thread_major_diameter,
     pitch=pitch-0.2,

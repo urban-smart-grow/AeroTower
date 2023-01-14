@@ -16,7 +16,7 @@ lid_compound = lid.combine(
 lid_outline = lid_compound.BoundingBox()
 
 
-gap = 0.2
+gap = 0.6
 wall = 2
 socket_height = tank_outline.zlen + wall
 

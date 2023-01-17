@@ -51,8 +51,8 @@ def locate_socket(loc: Location):
     return (
         cq.Solid
         .makeCone(
-            plant_cup.bottom_diameter/2 + wall,
-            plant_cup.top_diameter/2 + wall,
+            plant_cup.bottom_diameter/2 + wall*2,
+            plant_cup.top_diameter/2 + wall*2,
             plant_cup.height
         )
         .cut(

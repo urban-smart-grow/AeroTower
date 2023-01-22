@@ -1,8 +1,8 @@
-from operator import invert
-from cadquery import Vector, cq, exporters
+from cadquery import cq, exporters
 
 outline_width = 70
 wall = 2
+base_height = 4
 
 piezo_h = 3
 piezo_d = 20
@@ -21,6 +21,8 @@ pump_inlet_outline_padding = 1.2
 pump_socket_d = pump_in_out_gap+tube_d+pump_inlet_outline_padding
 pump_socket_w = 8.5
 pump_case_depth = pump_socket_d + wall
+
+wing_depth = 4
 
 
 mount_points = [
@@ -78,6 +80,32 @@ head = (
     .tag('temp')
     .move(0, tube_d/2 + wall + pump_inlet_outline_padding)
     .hole(tube_d)
+    .faces('<X')
+    .workplane(
+        centerOption='CenterOfMass'
+    )
+    .rect(outline_width, h)
+    .workplane(
+        centerOption='CenterOfMass',
+        offset=wing_depth,
+    )
+    .move(0, h/2-0.5)
+    .rect(outline_width, 1)
+    .loft(combine=True)
+    .tag('right_wing')
+    .faces('>X')
+    .workplane(
+        centerOption='CenterOfMass'
+    )
+    .rect(outline_width, h)
+    .workplane(
+        centerOption='CenterOfMass',
+        offset=wing_depth,
+    )
+    .move(0, h/2-0.5)
+    .rect(outline_width, 1)
+    .loft(combine=True)
+    .tag('left_wing')
     .edges('|Z')
     .fillet(2)
     .workplaneFromTagged('temp')
@@ -111,9 +139,7 @@ head = (
     .slot2D(h*3, (piezo_d-wall*2), 90)
     .extrude(wall, combine='s')
     .tag('piezo_slot_case')
-    .rotate(Vector(), Vector(0, 0, 1), 180)
-    .add_mount_points()
-    .circle(2).extrude(h + 2)
+
 )
 
 

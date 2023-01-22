@@ -1,76 +1,45 @@
 from cadquery import cq, exporters
 from head_tank import add_mount_points
+from typing import Callable
 
-length = 100
-width = 70
-base_height = 4
+bb_width = 57
+bb_length = 85
+bb_height = 9.5
+xiao_height = 7
+xiao_cutout = 26
+gap = 0.2
+wall = 2
 
+length = bb_length + (gap + wall) * 2
+width = bb_width + (gap + wall) * 2
+base_height = wall * 2
 
+cq.Workplane.add_mount_points: Callable
 cq.Workplane.add_mount_points = add_mount_points
-
-mount_points = [
-    # Xiao with extension board
-    (67.5, 5), (87.5, 5), (87.5, 40), (67.5, 40),
-    # Atomizer
-    (35, 20), (35, 40), (5, 30),
-    # Pump/Mosfet
-    (35, 45), (35, 65), (5, 55),
-]
-
-battery_mount_outline = (40, 16, 14)
-battery_mount_cut = (40, 6, 14)
 
 head_electronics_case = (
     cq.Workplane('XY')
-    .box(length, width, base_height, centered=False)
-    .tag('base')
+    .rect(width, length)
+    .rect(bb_width, bb_length)
+    .extrude(bb_height + base_height)
+    .faces('<Z')
+    .rect(width, length)
+    .extrude(base_height)
     .faces('>Z')
-    .workplane()
-    .pushPoints(mount_points)
-    .circle(2)
-    .extrude(2)
-    .pushPoints(mount_points)
-    .circle(1)
-    .extrude(5)
-    .faces('>Z', 'base')
-    .vertices('<XY')
-    .workplane(centerOption='CenterOfMass').tag('battery_mount')
-    .box(*battery_mount_outline, centered=False)
-    .workplaneFromTagged('battery_mount')
-    .center(0, 5)
-    .box(*battery_mount_cut, centered=False, combine='s')
-    .faces('>Z', 'base')
-    .workplane(centerOption='CenterOfMass', offset=-2)
-    .box(
-        10, width, 2,
-        centered=(True, True, False),
-        combine='s'
-    )
-    .tag('wire_channel')
-    .faces('>Z', 'base')
-    .edges('<Y')
-    .workplane(centerOption='CenterOfMass', offset=-4)
-    .box(
-        10, 6, 4,
-        centered=(True, False, False),
-        combine='s'
-    )
-    .tag('wire_outlet')
+    .rect(bb_width + wall, bb_length + wall)
+    .rect(bb_width, bb_length)
+    .extrude(xiao_height)
+    .faces('<<Y[2]')
+    .edges('>Z')
+    .workplane(centerOption='CenterOfMass', invert=True)
+    .slot2D(xiao_cutout, xiao_height*2)
+    .extrude(wall, combine='s')
+    .faces('>>X[-2]')
+    .edges('>Z')
+    .workplane(centerOption='CenterOfMass')
+    .hole(xiao_height * 2)
     .edges('|Z')
     .fillet(2)
-    .faces('>Z', 'base')
-    .edges('>Y')
-    .workplane(centerOption='CenterOfMass', offset=-4)
-    .move(0, -20.6)
-    .box(
-        8.6, 18.6, 4,
-        centered=(True, False, False),
-        combine='s'
-    )
-    .tag('pump_hole')
-    .translate((-length/2, -width/2, 0))
-    .add_mount_points()
-    .circle(2).extrude(2, combine='s')
 )
 
 if __name__ == '__main__':

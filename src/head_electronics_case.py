@@ -14,9 +14,6 @@ length = bb_length + (gap + wall) * 2
 width = bb_width + (gap + wall) * 2
 base_height = wall * 2
 
-cq.Workplane.add_mount_points: Callable
-cq.Workplane.add_mount_points = add_mount_points
-
 head_electronics_case = (
     cq.Workplane('XY')
     .rect(width, length)

@@ -1,38 +1,43 @@
 from cadquery import Vector, cq, exporters
 import head_electronics_case as case
 
+
+bb_width = 57
+bb_length = 85
+height = 30
+xiao_height = 7
+xiao_cutout = 26
+gap = 0.2
 wall = 2
-height = 40
 
-outer_xy = (case.length + wall * 2, case.width + wall * 2)
+length = bb_length + (gap + wall) * 2
+width = bb_width + (gap + wall) * 2
+base_height = wall
 
-cutout = tuple(map(lambda x: x*2, case.battery_mount_outline))
 
 lid = (
     cq.Workplane('XY')
-    .rect(*outer_xy)
-    .rect(case.length, case.width)
-    .extrude(height)
+    .rect(bb_width, bb_length)
+    .rect(bb_width - wall, bb_length - wall)
+    .extrude(base_height + height - xiao_height)
     .faces('<Z')
-    .rect(*outer_xy)
-    .extrude(wall)
-    .edges('|Z')
-    .fillet(2)
-    .faces('>Y')
+    .rect(bb_width, bb_length)
+    .rect(width, length)
+    .extrude(height + base_height)
+    .faces('<Z')
+    .rect(width, length)
+    .extrude(base_height)
+    .faces('<<Y[1]')
     .edges('>Z')
     .workplane(centerOption='CenterOfMass', invert=True)
-    .slot2D(10, 8)
-    .extrude(case.width + wall * 2, combine='s')
-    .add(
-        cq.Workplane('XY')
-        .rect(case.length, case.width)
-        .rect(case.length - wall*2, case.width - wall*2)
-        .extrude(height - case.base_height)
-        .tag('inner_base')
-        .edges('|Z')
-        .fillet(2)
-        .vertices('>Z', 'inner_base')
-        .box(*cutout, combine='s', centered=True)
-    )
+    .slot2D(xiao_cutout, xiao_height*2)
+    .extrude(wall*2, combine='s')
+    .faces('>X')
+    .edges('>Z')
+    .workplane(centerOption='CenterOfMass')
+    .hole(xiao_height * 2)
+    .edges('|Z')
+    .fillet(2)
 )
+
 exporters.export(lid, './exports/head_electronics_lid.stl')

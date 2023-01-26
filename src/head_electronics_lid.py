@@ -51,9 +51,16 @@ lid = (
     .faces('<Y', 'inner border')
     .edges('>Z')
     .workplane(centerOption='CenterOfMass', invert=True, offset=-wall)
-    .move(0, -(height-xiao_height))
+    .move(0, -height - xiao_height)
     .rect(xiao_cutout, height*2)
     .extrude(shell_length + 2 * wall, 'cut')
+    .tag('cutout rect')
+    # slot rounding
+    .workplaneFromTagged('cutout rect')
+    .move(0, -xiao_height)
+    .slot2D(xiao_cutout, xiao_height*2)
+    .extrude(shell_length + 2 * wall, 'cut')
+
 
 )
 

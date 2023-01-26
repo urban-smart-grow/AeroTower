@@ -2,41 +2,49 @@ from cadquery import cq, exporters
 from head_tank import add_mount_points
 from typing import Callable
 
-bb_width = 57
-bb_length = 85
+bb_width = 58
+bb_length = 86
 bb_height = 9.5
 xiao_height = 7
 xiao_cutout = 26
 gap = 0.2
 wall = 2
+cable_hole_d = 4
 
-length = bb_length + (gap + wall) * 2
-width = bb_width + (gap + wall) * 2
+length = bb_length + wall * 2
+width = bb_width + wall * 2
 base_height = wall * 2
 
 head_electronics_case = (
     cq.Workplane('XY')
-    .rect(width, length)
-    .rect(bb_width, bb_length)
-    .extrude(bb_height + base_height)
-    .faces('<Z')
+    # base
     .rect(width, length)
     .extrude(base_height)
-    .faces('>Z')
-    .rect(bb_width + wall, bb_length + wall)
+    .tag('base')
+    # border
+    .faces('<Z', 'base')
+    .rect(width, length)
     .rect(bb_width, bb_length)
-    .extrude(xiao_height)
-    .faces('<<Y[2]')
+    .extrude(bb_height + xiao_height)
+    # front hole
+    .faces('>Y')
     .edges('>Z')
     .workplane(centerOption='CenterOfMass', invert=True)
     .slot2D(xiao_cutout, xiao_height*2)
     .extrude(wall, combine='s')
-    .faces('>>X[-2]')
+    # side holes
+    .faces('>X')
     .edges('>Z')
     .workplane(centerOption='CenterOfMass')
     .hole(xiao_height * 2)
+    # fillets
     .edges('|Z')
     .fillet(2)
+    # bottom hole
+    .faces('>X')
+    .edges('<Z')
+    .workplane(centerOption='CenterOfMass')
+    .hole(cable_hole_d)
 )
 
 if __name__ == '__main__':

@@ -1,43 +1,64 @@
-from cadquery import Vector, cq, exporters
-import head_electronics_case as case
+from cadquery import cq, exporters
+from head_electronics_case import (
+    head_electronics_case as case,
+    cable_hole_d,  bb_width, bb_length,
+    length, width, gap, xiao_cutout, xiao_height
+)
 
 
-bb_width = 57
-bb_length = 85
-height = 30
-xiao_height = 7
-xiao_cutout = 26
-gap = 0.2
+height = 20
 wall = 2
 
-length = bb_length + (gap + wall) * 2
-width = bb_width + (gap + wall) * 2
+shell_length = length + wall * 2
+shell_width = width + wall * 4
 base_height = wall
+pump_spacing = 24
 
+case_bounding_box = case.combine().objects[0].BoundingBox()
 
 lid = (
     cq.Workplane('XY')
-    .rect(bb_width, bb_length)
-    .rect(bb_width - wall, bb_length - wall)
-    .extrude(base_height + height - xiao_height)
-    .faces('<Z')
-    .rect(bb_width, bb_length)
-    .rect(width, length)
-    .extrude(height + base_height)
-    .faces('<Z')
+    # base
     .rect(width, length)
     .extrude(base_height)
-    .faces('<<Y[1]')
-    .edges('>Z')
-    .workplane(centerOption='CenterOfMass', invert=True)
-    .slot2D(xiao_cutout, xiao_height*2)
-    .extrude(wall*2, combine='s')
-    .faces('>X')
-    .edges('>Z')
-    .workplane(centerOption='CenterOfMass')
-    .hole(xiao_height * 2)
+    .tag('base')
+    # inner border
+    .faces('<Z', 'base')
+    .rect(width, length)
+    .rect(bb_width-gap, bb_length-gap)
+    .extrude(height)
+    .tag('inner border')
+    # outer boarder
+    .faces('<Z', 'base')
+    .moveTo(pump_spacing/2, 0)
+    .rect(shell_width + pump_spacing, shell_length)
+    .rect(width - gap + pump_spacing, length - gap)
+    .extrude(height + case_bounding_box.zlen)
+    .tag('outer border')
+    # base extension
+    .faces('<Z', 'base')
+    .moveTo(pump_spacing/2, 0)
+    .rect(shell_width + pump_spacing, shell_length)
+    .extrude(base_height)
+    # cable hole
+    .faces('>Z')
+    .edges('>>X[1]')
+    .hole(cable_hole_d,  case_bounding_box.zlen)
+    # fillets
     .edges('|Z')
     .fillet(2)
+    # slot
+    .faces('<Y', 'inner border')
+    .edges('>Z')
+    .workplane(centerOption='CenterOfMass', invert=True, offset=-wall)
+    .move(0, -(height-xiao_height))
+    .rect(xiao_cutout, height*2)
+    .extrude(shell_length + 2 * wall, 'cut')
+
 )
+
+outline = lid.combine().objects[0].BoundingBox()
+
+print(f'{outline.xlen:0.2f}, {outline.ylen:0.2f}, {outline.zlen:0.2f}')
 
 exporters.export(lid, './exports/head_electronics_lid.stl')

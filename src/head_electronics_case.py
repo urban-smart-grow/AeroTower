@@ -25,7 +25,7 @@ head_electronics_case = (
     .faces('<Z', 'base')
     .rect(width, length)
     .rect(bb_width, bb_length)
-    .extrude(bb_height + xiao_height)
+    .extrude(bb_height + xiao_height*2)
     # front hole
     .faces('>Y')
     .edges('>Z')

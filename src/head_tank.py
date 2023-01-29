@@ -14,6 +14,8 @@ h = piezo_case_d
 l = piezo_case_d
 w = outline_width - wall * 2
 
+outline_length = l+wall*2
+
 pump_in_out_gap = 4
 pump_case_width = piezo_case_d
 tube_d = 4.5
@@ -42,12 +44,23 @@ def add_mount_points(self: cq.Workplane):
 
 cq.Workplane.add_mount_points = add_mount_points
 
-head = (
+head_tank = (
     cq.Workplane('XY')
-    .box(l+wall*2, w+wall*2, h)
+    .box(outline_length, outline_width, h)
+    .tag('case')
+    # wings
+    .faces('>Z', 'case')
+    .workplane(centerOption='CenterOfMass')
+    .rect(outline_length + wing_depth * 2, outline_width)
+    .extrude(-wing_depth)
+    .tag('wings')
+    .edges('(>X or <X) and >>Z[2]')
+    .chamfer(3.9999)
+    .edges('|Z')
+    .fillet(2)
+    # tank hole
     .workplane(offset=wall)
     .box(l, w, h, combine='s')
-    .tag('case')
     .faces('<Y', 'case')
     .edges('<Z')
     .workplane(
@@ -80,32 +93,6 @@ head = (
     .tag('temp')
     .move(0, tube_d/2 + wall + pump_inlet_outline_padding)
     .hole(tube_d)
-    .faces('<X')
-    .workplane(
-        centerOption='CenterOfMass'
-    )
-    .rect(outline_width, h)
-    .workplane(
-        centerOption='CenterOfMass',
-        offset=wing_depth,
-    )
-    .move(0, h/2-0.5)
-    .rect(outline_width, 1)
-    .loft(combine=True)
-    .tag('right_wing')
-    .faces('>X')
-    .workplane(
-        centerOption='CenterOfMass'
-    )
-    .rect(outline_width, h)
-    .workplane(
-        centerOption='CenterOfMass',
-        offset=wing_depth,
-    )
-    .move(0, h/2-0.5)
-    .rect(outline_width, 1)
-    .loft(combine=True)
-    .tag('left_wing')
     .edges('|Z')
     .fillet(2)
     .workplaneFromTagged('temp')
@@ -128,9 +115,9 @@ head = (
     .tag('piezo_slot')
     .faces('>Y',  'piezo_socket')
     .workplane(centerOption='CenterOfMass')
-    .transformed(offset=cq.Vector(0, 0, 0), rotate=cq.Vector(-10, 0, 0))
+    .transformed(offset=cq.Vector(0, 0, 0), rotate=cq.Vector(-7.8, 0, 0))
     .move(0, wall)
-    .hole(filter_d, piezo_case_h + wall)
+    .hole(filter_d, (outline_length + wall)*2 + wall)
     .faces('>Y',  'piezo_socket')
     .tag('filter_hole')
     .workplane(centerOption='CenterOfMass', offset=-wall)
@@ -139,9 +126,11 @@ head = (
     .slot2D(h*3, (piezo_d-wall*2), 90)
     .extrude(wall, combine='s')
     .tag('piezo_slot_case')
-
 )
 
+bounding_box = head_tank.combine().objects[0].BoundingBox()
+
+print(f'{bounding_box.xlen:0.2f}, {bounding_box.ylen:0.2f}, {bounding_box.zlen:0.2f}')
 
 if __name__ == '__main__':
-    exporters.export(head, './exports/head_tank.stl')
+    exporters.export(head_tank, './exports/head_tank.stl')

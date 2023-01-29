@@ -6,7 +6,7 @@ from plant_cup import plant_cup
 from head_mount import head_mount, wall as head_mount_wall
 from head_electronics_case import head_electronics_case
 from head_electronics_lid import lid as head_electronics_lid
-from head_tank import head as head_tank
+from head_tank import head_tank as head_tank
 from utils.calculate_points_on_circle import calculate_circle_points
 
 assembly = Assembly()

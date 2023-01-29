@@ -1,11 +1,11 @@
 from cadquery import cq, exporters
 from cq_warehouse.thread import IsoThread
 import body
-from head_tank import head
+from head_tank import head_tank
 from head_electronics_lid import lid
 
 head_tank_compound: cq.Compound
-head_tank_compound = head.combine().objects[0]
+head_tank_compound = head_tank.combine().objects[0]
 tank_outline = (
     head_tank_compound.BoundingBox()
 )
@@ -18,7 +18,7 @@ lid_outline = lid_compound.BoundingBox()
 
 gap = 0.6
 wall = 2
-socket_height = tank_outline.zlen + wall
+socket_height = tank_outline.zlen/2 + wall
 
 thread = IsoThread(
     major_diameter=body.top_thread_major_diameter,

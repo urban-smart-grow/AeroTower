@@ -32,7 +32,7 @@ lid = (
     .faces('<Z', 'base')
     .moveTo(pump_spacing/2, 0)
     .rect(shell_width + pump_spacing, shell_length)
-    .rect(width - gap + pump_spacing, length - gap)
+    .rect(width - gap*2 + pump_spacing, length - gap*2)
     .extrude(height + case_bounding_box.zlen)
     .tag('outer border')
     # base extension

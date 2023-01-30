@@ -1,24 +1,27 @@
 from cadquery import cq, exporters
 from cq_warehouse.thread import IsoThread
 import body
-from head_tank import head_tank
-from head_electronics_lid import lid
-
-head_tank_compound: cq.Compound
-head_tank_compound = head_tank.combine().objects[0]
-tank_outline = (
-    head_tank_compound.BoundingBox()
+from head_tank import (
+    head_tank,
+    outline_length, outline_width, wing_depth, h as tank_height
 )
+from head_electronics_lid import lid, pump_spacing
+from head_electronics_case import head_electronics_case as case
 
 lid_compound: cq.Compound
 lid_compound = lid.combine(
 ).objects[0]
 lid_outline = lid_compound.BoundingBox()
 
+case_compound: cq.Compound
+case_compound = case.combine(
+).objects[0]
+case_outline = case_compound.BoundingBox()
+
 
 gap = 0.6
 wall = 2
-socket_height = tank_outline.zlen/2 + wall
+socket_height = tank_height + wall * 2
 
 thread = IsoThread(
     major_diameter=body.top_thread_major_diameter,
@@ -28,32 +31,73 @@ thread = IsoThread(
     end_finishes=('fade', 'fade')
 )
 
-head_mount = (
+outline_width = lid_outline.ylen - wall*2 + gap*2
+outline_length = outline_length+gap*2
+cutout = (
     cq.Workplane('XY')
-    .circle(thread.min_radius)
-    .rect(
-        tank_outline.xlen + gap,
-        tank_outline.ylen + gap,
+    .box(
+        outline_length,
+        outline_width,
+        tank_height,
+        centered=(True, True, False)
     )
+    .tag('case')
+    # wings
+    .faces('>Z', 'case')
+    .workplane(centerOption='CenterOfMass', offset=wall)
+    .rect(outline_length + wing_depth * 2, outline_width)
+    .extrude(-wing_depth - wall*2)
+    .tag('wings')
+    # chamfers
+    .edges('(>X or <X or >Y or <Y) and >>Z[2]')
+    .chamfer(wing_depth-0.001)
+    # fillets
+    .edges('|Z')
+    .fillet(2)
+)
+
+head_mount = (
+    cq.Workplane('XY').tag('base')
+    # base
+    .circle(thread.min_radius)
     .extrude(socket_height)
-    .faces('+Z')
-    .workplane(offset=-wall)
-    .rect(lid_outline.xlen + gap, lid_outline.ylen + gap)
-    .extrude(wall, combine='s')
+    # lid cutout
+    .faces('>Z')
+    .workplane()
+    .rect(lid_outline.xlen + gap*2, lid_outline.ylen + gap*2)
+    .extrude(-wall, combine='s')
+    # case cutout
+    .faces('>Z')
+    .workplane()
+    .moveTo(0, pump_spacing/2)
+    .rect(case_outline.ylen + gap*2, case_outline.xlen + gap*2)
+    .extrude(-wall*2, combine='s')
+    # fog cutouts
     .edges('<Z and (<<Y[1] or >>Y[1])')
     .cutEach(
         lambda loc: cq.Solid.makeCone(
-            tank_outline.xlen/2,
+            outline_length/2,
             0,
-            tank_outline.zlen
+            tank_height
         ).locate(loc)
     )
+    # fillets
     .edges('|Z')
     .fillet(2)
+    # tank cutout
+    .workplaneFromTagged('base')
+    .cut(cutout)
+    # thread
     .add(
         thread
     )
 )
 
 if __name__ == '__main__':
-    exporters.export(head_mount, './exports/head_mount.stl')
+    exporters.export(
+        head_mount.add(
+            head_tank
+            .combine()
+            .objects[0]
+            .translate((0, -(outline_width-70)/2, tank_height/2))),
+        './exports/head_mount.stl')

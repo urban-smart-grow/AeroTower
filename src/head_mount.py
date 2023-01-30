@@ -94,10 +94,4 @@ head_mount = (
 )
 
 if __name__ == '__main__':
-    exporters.export(
-        head_mount.add(
-            head_tank
-            .combine()
-            .objects[0]
-            .translate((0, -(outline_width-70)/2, tank_height/2))),
-        './exports/head_mount.stl')
+    exporters.export(head_mount,  './exports/head_mount.stl')

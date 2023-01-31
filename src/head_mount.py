@@ -21,6 +21,7 @@ case_outline = case_compound.BoundingBox()
 gap = 0.1
 wall = 2
 socket_height = 16
+layer_height = 4
 
 thread = IsoThread(
     major_diameter=body.top_thread_major_diameter,
@@ -30,8 +31,9 @@ thread = IsoThread(
     end_finishes=('fade', 'fade')
 )
 
-outline_width = lid_outline.ylen - wall*4 + gap*2
+outline_width = outline_width + gap*2
 outline_length = outline_length+gap*2
+lid_outline_width = lid_outline.ylen - wall*4 + gap*2
 cutout = (
     cq.Workplane('XY')
     .box(
@@ -43,9 +45,9 @@ cutout = (
     .tag('case')
     # wings
     .faces('>Z', 'case')
-    .workplane(centerOption='CenterOfMass', offset=wall)
+    .workplane(centerOption='CenterOfMass', offset=layer_height)
     .rect(outline_length + wing_depth * 2, outline_width)
-    .extrude(-wing_depth - wall*2)
+    .extrude(-wing_depth - layer_height*2)
     .tag('wings')
     # chamfers
     .edges('(>X or <X or >Y or <Y) and >>Z[2]')
@@ -65,29 +67,34 @@ head_mount = (
     .faces('>Z')
     .workplane()
     .rect(lid_outline.xlen + gap*2, lid_outline.ylen + gap*2)
-    .extrude(-wall, combine='s')
+    .extrude(-layer_height, combine='s')
     # case cutout
     .faces('>Z')
     .workplane()
     .moveTo(0, pump_spacing/2)
     .rect(case_outline.ylen + gap*2, case_outline.xlen + gap*2)
-    .extrude(-wall*2, combine='s')
-    # fog cutouts
-    .edges('<Z and (<<Y[1] or >>Y[1])')
-    .cutEach(
-        lambda loc: cq.Solid.makeCone(
-            outline_length/2,
-            0,
-            tank_height
-        ).locate(loc)
-    )
-    # fillets
-    .edges('|Z')
-    .fillet(2)
+    .extrude(-layer_height*2, combine='s')
     # tank cutout
     .faces('<Z')
     .workplane()
-    .cut(cutout.translate((0, 0, socket_height-(tank_height + wall * 2))))
+    .cut(
+        cutout
+        .translate((
+            0,
+            -(lid_outline_width-outline_width)/2,
+            socket_height-(tank_height + layer_height * 2)
+        )
+        ))
+    # fillets
+    .edges('|Z')
+    .fillet(2)
+    # tunnel
+    .box(
+        outline_length,
+        lid_outline_width,
+        socket_height*2,
+        combine='s'
+    )
     # thread
     .add(
         thread

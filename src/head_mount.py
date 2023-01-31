@@ -95,6 +95,10 @@ head_mount = (
         socket_height*2,
         combine='s'
     )
+    # piezo cable hole
+    .workplaneFromTagged('base')
+    .move(0, lid_outline_width/2)
+    .circle(2).extrude(50, 'cut')
     # thread
     .add(
         thread

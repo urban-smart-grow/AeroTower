@@ -21,7 +21,7 @@ case_outline = case_compound.BoundingBox()
 
 gap = 0.6
 wall = 2
-socket_height = tank_height + wall * 2
+socket_height = 16
 
 thread = IsoThread(
     major_diameter=body.top_thread_major_diameter,
@@ -31,7 +31,7 @@ thread = IsoThread(
     end_finishes=('fade', 'fade')
 )
 
-outline_width = lid_outline.ylen - wall*2 + gap*2
+outline_width = lid_outline.ylen - wall*4 + gap*2
 outline_length = outline_length+gap*2
 cutout = (
     cq.Workplane('XY')
@@ -54,7 +54,8 @@ cutout = (
     # fillets
     .edges('|Z')
     .fillet(2)
-)
+).combine().objects[0]
+
 
 head_mount = (
     cq.Workplane('XY').tag('base')
@@ -85,8 +86,9 @@ head_mount = (
     .edges('|Z')
     .fillet(2)
     # tank cutout
-    .workplaneFromTagged('base')
-    .cut(cutout)
+    .faces('<Z')
+    .workplane()
+    .cut(cutout.translate((0, 0, socket_height-(tank_height + wall * 2))))
     # thread
     .add(
         thread

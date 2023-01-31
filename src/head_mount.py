@@ -2,7 +2,6 @@ from cadquery import cq, exporters
 from cq_warehouse.thread import IsoThread
 import body
 from head_tank import (
-    head_tank,
     outline_length, outline_width, wing_depth, h as tank_height
 )
 from head_electronics_lid import lid, pump_spacing
@@ -19,7 +18,7 @@ case_compound = case.combine(
 case_outline = case_compound.BoundingBox()
 
 
-gap = 0.6
+gap = 0.1
 wall = 2
 socket_height = 16
 

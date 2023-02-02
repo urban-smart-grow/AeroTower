@@ -6,7 +6,7 @@ from head_electronics_case import (
 )
 
 
-height = 20
+height = 16
 wall = 2
 
 shell_length = length + wall * 2
@@ -22,44 +22,33 @@ lid = (
     .rect(width, length)
     .extrude(base_height)
     .tag('base')
-    # inner border
-    .faces('<Z', 'base')
-    .rect(width, length)
-    .rect(bb_width-gap, bb_length-gap)
-    .extrude(height)
-    .tag('inner border')
     # outer boarder
     .faces('<Z', 'base')
-    .moveTo(pump_spacing/2, 0)
     .rect(shell_width + pump_spacing, shell_length)
     .rect(width - gap*2 + pump_spacing, length - gap*2)
     .extrude(height + case_bounding_box.zlen)
     .tag('outer border')
     # base extension
     .faces('<Z', 'base')
-    .moveTo(pump_spacing/2, 0)
     .rect(shell_width + pump_spacing, shell_length)
     .extrude(base_height)
     # cable hole
     .faces('>Z')
-    .edges('>>X[1]')
+    .edges('<<X[1]')
     .hole(cable_hole_d,  case_bounding_box.zlen)
     # fillets
     .edges('|Z')
     .fillet(2)
     # slot
-    .faces('<Y', 'inner border')
+    .faces('<Y')
     .edges('>Z')
-    .workplane(centerOption='CenterOfMass', invert=True, offset=-wall)
-    .move(0, -height - xiao_height)
+    .workplane(centerOption='CenterOfMass')
+    .moveTo(pump_spacing/2, 0)
     .rect(xiao_cutout, height*2)
-    .extrude(shell_length + 2 * wall, 'cut')
-    .tag('cutout rect')
-    # slot rounding
-    .workplaneFromTagged('cutout rect')
-    .move(0, -xiao_height)
+    .extrude('last', 'cut')
+    .moveTo(pump_spacing/2, -height)
     .slot2D(xiao_cutout, xiao_height*2)
-    .extrude(shell_length + 2 * wall, 'cut')
+    .extrude('last', 'cut')
 
 
 )

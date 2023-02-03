@@ -9,7 +9,7 @@ import time
 
 wall = 1
 diameter = 160
-height = 164
+height = 150
 number_of_cup_holders = 5
 cup_angle = 45
 socket_height = 20
@@ -118,7 +118,7 @@ body = (
     .circle(diameter/2)
     .circle(diameter/2-wall)
     .extrude(height-(socket_height+thread_body_radius_delta))
-    .workplane(offset=-20)
+    .workplane(offset=-30)
     .pushPoints(points)
     .cutEach(locate_cone)
     .pushPoints(points)

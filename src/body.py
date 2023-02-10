@@ -3,6 +3,7 @@ from cadquery import Location, Vector, cq, exporters
 from primitives.drop_cut import drop_cut
 from primitives.hollow_cone import hollow_cone
 from utils.calculate_points_on_circle import calculate_circle_points
+from utils.calculate_cone_radius_at_z_height import calculate_cone_radius_at_z_height
 from cq_warehouse.thread import IsoThread
 import plant_cup
 import time
@@ -14,6 +15,7 @@ number_of_cup_holders = 5
 cup_angle = 45
 socket_height = 20
 pitch = 8
+cup_bottom_overhang_in_mm = 10
 
 socket_offset = (diameter)/2 - (
     math.cos(math.radians(cup_angle))
@@ -39,6 +41,7 @@ def locate_cone(loc: Location):
             plant_cup.top_diameter/2,
             plant_cup.height
         )
+        .translate((0, 0, -cup_bottom_overhang_in_mm))
         .rotate(Vector(), Vector(-y, x, 0), cup_angle)
         .locate(loc)
     )
@@ -48,12 +51,19 @@ def locate_socket(loc: Location):
     x, y, z = loc.toTuple()[0]
     angle = math.degrees(math.atan2(y, x))
 
+    bottom_r = calculate_cone_radius_at_z_height(
+        plant_cup.bottom_diameter/2,
+        plant_cup.top_diameter/2,
+        plant_cup.height,
+        cup_bottom_overhang_in_mm
+    )
+
     return (
         cq.Solid
         .makeCone(
-            plant_cup.bottom_diameter/2 + wall*2,
+            bottom_r + wall*2,
             plant_cup.top_diameter/2 + wall*2,
-            plant_cup.height
+            plant_cup.height - cup_bottom_overhang_in_mm
         )
         .cut(
             cq.Solid
@@ -62,6 +72,7 @@ def locate_socket(loc: Location):
                 plant_cup.top_diameter/2,
                 plant_cup.height
             )
+            .translate((0, 0, -cup_bottom_overhang_in_mm))
         )
         .cut(drop_cut(plant_cup.bottom_diameter))
         .rotate(Vector(), Vector(0, 0, 1), angle)
@@ -121,6 +132,7 @@ body = (
     .workplane(offset=-30)
     .pushPoints(points)
     .cutEach(locate_cone)
+    # .eachpoint(locate_cone, combine='a')
     .pushPoints(points)
     .eachpoint(locate_socket, combine='a')
     .add(top_thread)

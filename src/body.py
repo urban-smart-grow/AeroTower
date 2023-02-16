@@ -1,4 +1,5 @@
 import math
+from constants import thread_gap_in_mm
 from cadquery import Location, Vector, cq, exporters
 from primitives.drop_cut import drop_cut
 from primitives.hollow_cone import hollow_cone
@@ -98,7 +99,7 @@ top_thread = top_thread.cq_object.translate(Vector(0, 0, height-socket_height))
 bottom_thread_major_diameter = diameter-(wall*2)
 
 bottom_thread = IsoThread(
-    major_diameter=bottom_thread_major_diameter,
+    major_diameter=bottom_thread_major_diameter - thread_gap_in_mm*2,
     pitch=pitch,
     length=socket_height,
     external=True,

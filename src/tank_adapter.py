@@ -1,10 +1,11 @@
 from cadquery import Vector, cq, exporters
 from cq_warehouse.thread import IsoThread
+from constants import thread_gap_in_mm
 import tank
 import body
 
 outer_thread = IsoThread(
-    major_diameter=tank.diameter-(tank.wall*2),
+    major_diameter=tank.diameter-(tank.wall*2)-(thread_gap_in_mm*2),
     external=True,
     length=tank.socket_height,
     pitch=tank.pitch,

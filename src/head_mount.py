@@ -6,6 +6,7 @@ from head_tank import (
 )
 from head_electronics_lid import lid, pump_spacing
 from head_electronics_case import head_electronics_case as case
+from constants import thread_gap_in_mm
 
 lid_compound: cq.Compound
 lid_compound = lid.combine(
@@ -23,8 +24,10 @@ wall = 2
 socket_height = 16
 layer_height = 4
 
+thread_major_diameter = body.top_thread_major_diameter - (thread_gap_in_mm*2)
+
 thread = IsoThread(
-    major_diameter=body.top_thread_major_diameter,
+    major_diameter=thread_major_diameter,
     pitch=8,
     length=socket_height,
     external=True,

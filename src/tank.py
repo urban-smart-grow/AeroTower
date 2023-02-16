@@ -9,7 +9,7 @@ socket_height = 20
 pitch = 8
 
 thread = IsoThread(
-    major_diameter=diameter-wall,
+    major_diameter=diameter-wall*2,
     pitch=pitch,
     length=socket_height,
     external=False,

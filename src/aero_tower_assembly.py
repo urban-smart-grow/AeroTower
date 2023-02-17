@@ -1,8 +1,8 @@
 from cadquery import Assembly, Color, Location, Vector, exporters
 from tank import tank, socket_height as tank_socket_h
 from tank_adapter import tank_adapter
-from body import body, socket_height as body_socket_h, socket_offset
-from plant_cup import plant_cup
+from body import body, cup_bottom_overhang_in_mm, socket_height as body_socket_h, socket_offset
+from plant_cup import plant_cup, height as cup_height
 from head_mount import head_mount, wall as head_mount_wall
 from head_electronics_case import head_electronics_case
 from head_electronics_lid import lid as head_electronics_lid
@@ -30,6 +30,8 @@ for x, y in calculate_circle_points(5, socket_offset):
             Vector(x, y,
                    tank.BoundingBox().zlen
                    - tank_socket_h
+                   - cup_bottom_overhang_in_mm
+                   - (cup_height * 0.01)
                    + body.combine().objects[0].BoundingBox().zlen/2
                    ),
             Vector(-y, x, 0),

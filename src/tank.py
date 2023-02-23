@@ -8,13 +8,16 @@ wall = 2
 socket_height = 20
 pitch = 8
 
+thread_major_diameter = diameter-wall*2
 thread = IsoThread(
-    major_diameter=diameter-wall*2,
+    major_diameter=thread_major_diameter,
     pitch=pitch,
     length=socket_height,
     external=False,
     end_finishes=('fade', 'fade')
-).cq_object.translate(Vector(0, 0, height-socket_height))
+)
+
+thread = thread.cq_object.translate(Vector(0, 0, height-socket_height))
 
 cq.Workplane.hollow_cone = hollow_cone
 
@@ -25,5 +28,10 @@ tank = thread.fuse(
         .translate(Vector(0, 0, wall))
     )
 )
+
+print('_'*30)
+print(__name__)
+print(f'{thread_major_diameter=}')
+print('_'*30)
 
 exporters.export(tank, './exports/tank.stl')

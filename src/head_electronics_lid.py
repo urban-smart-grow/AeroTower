@@ -55,6 +55,4 @@ lid = (
 
 outline = lid.combine().objects[0].BoundingBox()
 
-print(f'{outline.xlen:0.2f}, {outline.ylen:0.2f}, {outline.zlen:0.2f}')
-
 exporters.export(lid, './exports/head_electronics_lid.stl')

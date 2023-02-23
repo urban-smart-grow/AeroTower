@@ -1,1 +1,1 @@
-thread_gap_in_mm = 0.2
+thread_gap_in_mm = 0.4

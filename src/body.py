@@ -98,8 +98,9 @@ top_thread = top_thread.cq_object.translate(Vector(0, 0, height-socket_height))
 
 bottom_thread_major_diameter = diameter-(wall*2)
 
+bottom_thread_major_diameter_with_gap = bottom_thread_major_diameter - thread_gap_in_mm*2
 bottom_thread = IsoThread(
-    major_diameter=bottom_thread_major_diameter - thread_gap_in_mm*2,
+    major_diameter=bottom_thread_major_diameter_with_gap,
     pitch=pitch,
     length=socket_height,
     external=True,
@@ -133,7 +134,6 @@ body = (
     .workplane(offset=-30)
     .pushPoints(points)
     .cutEach(locate_cone)
-    # .eachpoint(locate_cone, combine='a')
     .pushPoints(points)
     .eachpoint(locate_socket, combine='a')
     .add(top_thread)
@@ -158,7 +158,11 @@ body = (
 end = time.time()
 
 
+print('_'*30)
+print(__name__)
 print(f'took {end-start:0.2f} seconds')
+print(f'{top_thread_major_diameter=}, {bottom_thread_major_diameter_with_gap=}')
+print('_'*30)
 
 if __name__ == '__main__':
     exporters.export(body, './exports/body.stl')

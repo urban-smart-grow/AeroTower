@@ -128,7 +128,6 @@ head_tank = (
 
 bounding_box = head_tank.combine().objects[0].BoundingBox()
 
-print(f'{bounding_box.xlen:0.2f}, {bounding_box.ylen:0.2f}, {bounding_box.zlen:0.2f}')
 
 if __name__ == '__main__':
     exporters.export(head_tank, './exports/head_tank.stl')

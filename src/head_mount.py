@@ -108,5 +108,11 @@ head_mount = (
     )
 )
 
+
+print('_'*30)
+print(__name__)
+print(f'{thread_major_diameter=}')
+print('_'*30)
+
 if __name__ == '__main__':
     exporters.export(head_mount,  './exports/head_mount.stl')

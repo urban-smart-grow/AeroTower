@@ -1,6 +1,4 @@
 from cadquery import cq, exporters
-from head_tank import add_mount_points
-from typing import Callable
 
 bb_width = 58
 bb_length = 86
@@ -13,7 +11,7 @@ cable_hole_d = 4
 
 length = bb_length + wall * 2
 width = bb_width + wall * 2
-base_height = wall * 2
+base_height = 2
 
 head_electronics_case = (
     cq.Workplane('XY')
@@ -40,11 +38,6 @@ head_electronics_case = (
     # fillets
     .edges('|Z')
     .fillet(2)
-    # bottom hole
-    .faces('>X')
-    .edges('<Z')
-    .workplane(centerOption='CenterOfMass')
-    .hole(cable_hole_d)
 )
 
 if __name__ == '__main__':

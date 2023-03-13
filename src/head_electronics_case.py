@@ -1,6 +1,4 @@
 from cadquery import cq, exporters
-from head_tank import add_mount_points
-from typing import Callable
 
 bb_width = 58
 bb_length = 86

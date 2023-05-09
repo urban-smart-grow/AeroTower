@@ -1,43 +1,71 @@
 from cadquery import cq, exporters
 import head_electronics_lid
-# import body
+from utils.calculate_points_on_circle import calculate_circle_points
+import body
 import math
 
 wall = 1
+base_strength = 2
 body_overlap = 4
 gap = 0.4
-body_diameter = 160  # body.diameter
+body_diameter = body.diameter
 body_radius = body_diameter / 2
-outer_radius = body_radius + wall
-inner_radius = body_radius + gap
+shell_outer_radius = body_radius + wall
+shell_inner_radius = body_radius + gap
+inner_radius = body_radius-wall
 cable_hole_radius = 8
 lid_bounding_box = head_electronics_lid.lid.combine().objects[0].BoundingBox()
 
 electronics_case_outstand = math.ceil(
     head_electronics_lid.lid.combine().objects[0].BoundingBox().zlen
-    + wall
+    + base_strength
 )
 height = electronics_case_outstand + body_overlap
+
 
 solar_module_case = (
     cq.Workplane('XY')
     .tag('base')
-    .circle(outer_radius)
-    .circle(inner_radius)
+    .circle(shell_outer_radius)
+    .circle(shell_inner_radius)
     .extrude(height)
     .workplaneFromTagged('base')
+    .circle(shell_inner_radius)
     .circle(inner_radius)
-    .circle(body_radius-wall)
     .extrude(electronics_case_outstand)
     .workplaneFromTagged('base')
-    .circle(outer_radius)
+    .circle(shell_outer_radius)
     .circle(cable_hole_radius)
-    .extrude(wall)
+    .extrude(base_strength)
+)
+
+
+cable_hook_gap = 4
+cable_hook_r = 3
+cable_hook_r2 = 6
+
+cable_hook_points = calculate_circle_points(
+    6, inner_radius - cable_hook_r2 - cable_hook_gap
+)
+
+
+def cable_hook(loc):
+    return (
+        cq.Solid
+        .makeCone(cable_hook_r, cable_hook_r2, height/2)
+        .locate(loc)
+    )
+
+
+solar_module_case = (
+    solar_module_case
+    .pushPoints(cable_hook_points)
+    .eachpoint(cable_hook, combine=True)
 )
 
 center_of_outline = (
     (lid_bounding_box.ylen/2 +
-     inner_radius) / 2
+     shell_inner_radius) / 2
 )
 
 # battery clamp

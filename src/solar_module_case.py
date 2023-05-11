@@ -1,19 +1,18 @@
 from cadquery import cq, exporters
 import head_electronics_lid
 from utils.calculate_points_on_circle import calculate_circle_points
-import body
+# import body
 import math
 
 wall = 1
 base_strength = 2
 body_overlap = 4
 gap = 0.4
-body_diameter = body.diameter
+body_diameter = 160  # body.diameter
 body_radius = body_diameter / 2
 shell_outer_radius = body_radius + wall
 shell_inner_radius = body_radius + gap
 inner_radius = body_radius-wall
-cable_hole_radius = 8
 lid_bounding_box = head_electronics_lid.lid.combine().objects[0].BoundingBox()
 
 electronics_case_outstand = math.ceil(
@@ -35,10 +34,10 @@ solar_module_case = (
     .extrude(electronics_case_outstand)
     .workplaneFromTagged('base')
     .circle(shell_outer_radius)
-    .circle(cable_hole_radius)
     .extrude(base_strength)
 )
 
+# cable hooks
 
 cable_hook_gap = 4
 cable_hook_r = 3
@@ -62,6 +61,8 @@ solar_module_case = (
     .pushPoints(cable_hook_points)
     .eachpoint(cable_hook, combine=True)
 )
+
+# mounts
 
 center_of_outline = (
     (lid_bounding_box.ylen/2 +
@@ -108,6 +109,22 @@ solar_module_case = (
     .rect(board_xlen, board_ylen)
     .extrude(board_zlen)
 )
+
+# cable/ventilation holes
+
+hole_points = calculate_circle_points(
+    4, shell_inner_radius
+)
+
+solar_module_case = (
+    solar_module_case
+    .rotateAboutCenter((0, 0, 1), -45)
+    .faces('>Z')
+    .workplane()
+    .pushPoints(list(hole_points)[1:])
+    .hole(8, body_overlap*2)
+)
+
 
 if __name__ == '__main__':
     exporters.export(solar_module_case, './exports/solar_module_case.stl')

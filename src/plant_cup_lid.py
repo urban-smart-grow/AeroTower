@@ -2,34 +2,32 @@ from cadquery import cq, exporters
 from utils.calculate_points_on_circle import calculate_circle_points
 import plant_cup
 
-height = 2
+base_h = 0.5
+skirt_h = 3
 vent_d = 1.4
 
-level_height = height/2
-top_r = plant_cup.top_diameter/2-plant_cup.wall_strength
-pitch = ((plant_cup.top_diameter-plant_cup.bottom_diameter)/2)/plant_cup.height
-bottom_r = top_r-pitch*level_height
+base_r = plant_cup.top_diameter/2
+skirt_r = base_r+plant_cup.wall_strength
 
 plant_cup_lid = (
     cq.Workplane('XY')
+    .tag('base')
     .cylinder(
-        level_height,
-        plant_cup.top_diameter/2,
-        centered=(True, True, False)
-    )
-    .add(
-        cq.Solid
-        .makeCone(top_r, bottom_r, level_height)
-        .translate((0, 0, level_height))
+        base_h,
+        base_r,
     )
     .faces('<Z')
     .workplane()
     .pushPoints(
-         list(calculate_circle_points(3, top_r*0.11))
-        + list(calculate_circle_points(5, top_r*0.33))
-        + list(calculate_circle_points(9, top_r*0.66))
+        list(calculate_circle_points(3, base_r*0.11))
+        + list(calculate_circle_points(5, base_r*0.33))
+        + list(calculate_circle_points(9, base_r*0.66))
     )
-    .hole(vent_d, height)
+    .hole(vent_d, base_h)
+    .workplaneFromTagged('base')
+    .circle(skirt_r)
+    .circle(base_r)
+    .extrude(skirt_h)
 )
 
 if __name__ == '__main__':
